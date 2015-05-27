@@ -12,4 +12,9 @@ get '/api/v1/greeting' => sub {
     return to_json { text => 'Hello World' };
 };
 
+get '/v1' => sub {
+    return template 'v1';
+};
+
+
 true;
