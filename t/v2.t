@@ -6,10 +6,11 @@ BEGIN {
 }
 
 use D2::Ajax;
-use Test::More tests => 2+1;
+use Test::More tests => 3+1;
 use Plack::Test;
 use HTTP::Request::Common;
 use Test::NoWarnings;
+use JSON::MaybeXS qw(decode_json);
 
 subtest v2_greeting => sub {
     plan tests => 4;
@@ -43,5 +44,19 @@ subtest v2_reverse => sub {
 
     my $res3  = $test->request( GET '/api/v2/reverse' );
     is $res3->content, '{"text":""}';
+};
+
+subtest v2_items => sub {
+    plan tests => 4;
+
+    my $app = D2::Ajax->to_app;
+
+    my $test = Plack::Test->create($app);
+
+    my $res  = $test->request( POST '/api/v2/item', {text => 'First Thing to do' } );
+    ok $res->is_success, '[POST /] successful';
+    is_deeply decode_json($res->content), { ok => 1, text  => 'First Thing to do' };
+    is $res->header('Content-Type'), 'application/json';
+    is $res->header('Access-Control-Allow-Origin'), '*';
 };
 
