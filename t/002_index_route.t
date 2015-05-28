@@ -1,6 +1,11 @@
 use strict;
 use warnings;
 
+BEGIN {
+    $ENV{DANCER_ENVIRONMENT} = 'test';
+}
+
+
 use D2::Ajax;
 use Test::More tests => 2;
 use Plack::Test;
