@@ -27,3 +27,6 @@ template: "simple"
 #       start_tag: '<%'
 #       end_tag:   '%>'
 
+app:
+  mongodb: d2-ajax
+

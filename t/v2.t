@@ -11,6 +11,7 @@ use Plack::Test;
 use HTTP::Request::Common;
 use Test::NoWarnings;
 use JSON::MaybeXS qw(decode_json);
+use MongoDB ();
 
 subtest v2_greeting => sub {
     plan tests => 4;
@@ -51,6 +52,9 @@ subtest v2_items => sub {
 
     my $app = D2::Ajax->to_app;
 
+    my $db_name = 'd2-ajax-' . $$ . '-' . time;
+    D2::Ajax->config->{app}{mongodb} = $db_name;
+
     my $test = Plack::Test->create($app);
 
     my $res  = $test->request( POST '/api/v2/item', {text => 'First Thing to do' } );
@@ -58,5 +62,9 @@ subtest v2_items => sub {
     is_deeply decode_json($res->content), { ok => 1, text  => 'First Thing to do' };
     is $res->header('Content-Type'), 'application/json';
     is $res->header('Access-Control-Allow-Origin'), '*';
+
+    my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
+    my $db   = $client->get_database( $db_name );
+    $db->drop;
 };
 

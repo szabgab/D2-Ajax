@@ -43,7 +43,7 @@ post '/api/v2/item' => sub {
     }
 
     my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
-    my $db   = $client->get_database( 'd2-ajax' );
+    my $db   = $client->get_database( config->{app}{mongodb} );
     my $items = $db->get_collection('items');
     $items->insert({
         text => $text,
