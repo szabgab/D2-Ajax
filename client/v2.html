@@ -9,6 +9,11 @@
 </head>
 <body>
 
+<form>
+<input name="str" id="str">
+<input type="submit" id="reverse" value="Reverse">
+</form>
+
 <div id="msg"></div>
 
 <script>
@@ -16,6 +21,15 @@ $(document).ready(function() {
     jQuery.get('http://127.0.0.1:5000/api/v2/greeting', function(data) {
         console.log(data);
         $("#msg").html(data["text"]);
+    });
+
+    $("#reverse").click(function() {
+        var str = $("#str").val();
+        jQuery.get('http://127.0.0.1:5000/api/v2/reverse?str=' + str , function(data) {
+            console.log(data);
+            $("#msg").html(data["text"]);
+        });
+       return false;
     });
 });
 </script>
