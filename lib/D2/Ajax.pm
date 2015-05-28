@@ -29,7 +29,7 @@ get '/api/v2/greeting' => sub {
 };
 
 get '/api/v2/reverse' => sub {
-    my $text = param('str');
+    my $text = param('str') // '';
     my $rev = reverse $text;
     return to_json { text => $rev };
 };
