@@ -48,7 +48,7 @@ subtest v2_reverse => sub {
 };
 
 subtest v2_items => sub {
-    plan tests => 6;
+    plan tests => 14;
 
     my $app = D2::Ajax->to_app;
 
@@ -68,6 +68,25 @@ subtest v2_items => sub {
     is scalar @{$items1->{items}}, 1;
     is $items1->{items}[0]{text}, 'First Thing to do';
 
+    my $res2  = $test->request( POST '/api/v2/item', { text => '' } );
+    is $res2->content, '{"error":"No text provided"}';
+
+    my $res3  = $test->request( POST '/api/v2/item' );
+    is $res3->content, '{"error":"No text provided"}';
+
+    my $get3  = $test->request( GET '/api/v2/items');
+    my $items3 = decode_json($get3->content);
+    is scalar @{$items3->{items}}, 1;
+    is $items3->{items}[0]{text}, 'First Thing to do';
+
+    my $res4  = $test->request( POST '/api/v2/item', { text => '  one more  ' });
+    is_deeply decode_json($res4->content), { ok => 1, text => 'one more' };
+
+    my $get4  = $test->request( GET '/api/v2/items');
+    my $items4 = decode_json($get4->content);
+    is scalar @{$items4->{items}}, 2;
+    is $items4->{items}[0]{text}, 'First Thing to do';
+    is $items4->{items}[1]{text}, 'one more';
 
     my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
     my $db   = $client->get_database( $db_name );
