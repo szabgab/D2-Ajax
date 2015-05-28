@@ -48,7 +48,7 @@ subtest v2_reverse => sub {
 };
 
 subtest v2_items => sub {
-    plan tests => 4;
+    plan tests => 6;
 
     my $app = D2::Ajax->to_app;
 
@@ -62,6 +62,12 @@ subtest v2_items => sub {
     is_deeply decode_json($res->content), { ok => 1, text  => 'First Thing to do' };
     is $res->header('Content-Type'), 'application/json';
     is $res->header('Access-Control-Allow-Origin'), '*';
+
+    my $get1  = $test->request( GET '/api/v2/items');
+    my $items1 = decode_json($get1->content);
+    is scalar @{$items1->{items}}, 1;
+    is $items1->{items}[0]{text}, 'First Thing to do';
+
 
     my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
     my $db   = $client->get_database( $db_name );

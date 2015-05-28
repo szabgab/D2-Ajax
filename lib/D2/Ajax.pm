@@ -1,6 +1,7 @@
 package D2::Ajax;
 use Dancer2;
 use MongoDB ();
+use JSON::MaybeXS;
 
 our $VERSION = '0.1';
 
@@ -49,6 +50,17 @@ post '/api/v2/item' => sub {
         text => $text,
     });
     return to_json { ok => 1, text => $text };
+};
+
+get '/api/v2/items' => sub {
+    my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
+    my $db   = $client->get_database( config->{app}{mongodb} );
+    my $items = $db->get_collection('items');
+
+    my @data =  $items->find->all;
+    my $json = JSON::MaybeXS->new;
+    $json->convert_blessed(1);
+    return $json->encode( { items =>  \@data } );
 };
 
 
