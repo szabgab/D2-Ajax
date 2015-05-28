@@ -6,9 +6,10 @@ BEGIN {
 }
 
 use D2::Ajax;
-use Test::More tests => 2;
+use Test::More tests => 2+1;
 use Plack::Test;
 use HTTP::Request::Common;
+use Test::NoWarnings;
 
 subtest v2_greeting => sub {
     plan tests => 4;
