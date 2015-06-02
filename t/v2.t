@@ -8,7 +8,7 @@ BEGIN {
 use D2::Ajax;
 use Test::More tests => 3+1;
 use Plack::Test;
-use HTTP::Request::Common;
+use HTTP::Request::Common qw(GET POST DELETE);
 use Test::NoWarnings;
 use JSON::MaybeXS qw(decode_json);
 use MongoDB ();
@@ -48,7 +48,7 @@ subtest v2_reverse => sub {
 };
 
 subtest v2_items => sub {
-    plan tests => 14;
+    plan tests => 25;
 
     my $app = D2::Ajax->to_app;
 
@@ -87,6 +87,27 @@ subtest v2_items => sub {
     is scalar @{$items4->{items}}, 2;
     is $items4->{items}[0]{text}, 'First Thing to do';
     is $items4->{items}[1]{text}, 'one more';
+
+    my @items = ("One 1", "Two 2", "Three 3");
+    foreach my $it (@items) {
+        my $res = $test->request( POST '/api/v2/item', { text => $it });
+        is_deeply decode_json($res->content), { ok => 1, text => $it };
+    }
+    my $get5  = $test->request( GET '/api/v2/items');
+    my $items5 = decode_json($get5->content);
+    is scalar @{$items5->{items}}, 5;
+
+    my $del3  = $test->request( DELETE '/api/v2/item/' . $items5->{items}[3]{'_id'}{'$oid'} );
+    is $del3->content, '{"ok":1}';
+
+    my $get6  = $test->request( GET '/api/v2/items');
+    my $items6 = decode_json($get6->content);
+    is scalar @{$items6->{items}}, 4;
+    is_deeply $items5->{items}[0], $items6->{items}[0];
+    is_deeply $items5->{items}[1], $items6->{items}[1];
+    is_deeply $items5->{items}[2], $items6->{items}[2];
+    is_deeply $items5->{items}[4], $items6->{items}[3];
+    is_deeply $items5->{items}[5], $items6->{items}[4];
 
     my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
     my $db   = $client->get_database( $db_name );
