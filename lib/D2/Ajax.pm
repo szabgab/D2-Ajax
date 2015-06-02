@@ -5,6 +5,14 @@ use JSON::MaybeXS;
 
 our $VERSION = '0.1';
 
+sub _mongodb {
+    my ($collection) = @_;
+
+    my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
+    my $db   = $client->get_database( config->{app}{mongodb} );
+    return $db->get_collection($collection);
+}
+
 hook before => sub {
     if (request->path =~ m{^/api/}) {
         header 'Content-Type' => 'application/json';
@@ -43,9 +51,7 @@ post '/api/v2/item' => sub {
         return to_json { error => 'No text provided' };
     }
 
-    my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
-    my $db   = $client->get_database( config->{app}{mongodb} );
-    my $items = $db->get_collection('items');
+    my $items = _mongodb('items');
     $items->insert({
         text => $text,
     });
@@ -53,10 +59,7 @@ post '/api/v2/item' => sub {
 };
 
 get '/api/v2/items' => sub {
-    my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
-    my $db   = $client->get_database( config->{app}{mongodb} );
-    my $items = $db->get_collection('items');
-
+    my $items = _mongodb('items');
     my @data =  $items->find->all;
     my $json = JSON::MaybeXS->new;
     $json->convert_blessed(1);
