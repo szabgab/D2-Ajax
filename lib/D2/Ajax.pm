@@ -19,6 +19,7 @@ hook before => sub {
     }
     if (request->path =~ m{^/api/v2/}) {
         header 'Access-Control-Allow-Origin' => '*';
+        header 'Access-Control-Allow-Methods' => 'GET, POST, OPTIONS, DELETE';
     }
 };
 
@@ -74,6 +75,10 @@ del '/api/v2/item/:id' => sub {
 
     my $json = JSON::MaybeXS->new;
     return to_json { ok  => 1 };
+};
+
+options '/api/v2/item/:id' => sub {
+    return '';
 };
 
 true;
