@@ -109,6 +109,11 @@ subtest v2_items => sub {
     is_deeply $items5->{items}[4], $items6->{items}[3];
     is_deeply $items5->{items}[5], $items6->{items}[4];
 
+#    https://rt.cpan.org/Ticket/Display.html?id=68644
+#    my $options  = $test->request( OPTIONS '/api/v2/item/anything' );
+#    ok $options->is_success, '[POST /] successful';
+#    is $options->header('Access-Control-Allow-Methods'), 'GET, POST, OPTIONS, DELETE';
+
     my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
     my $db   = $client->get_database( $db_name );
     $db->drop;
