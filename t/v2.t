@@ -48,7 +48,7 @@ subtest v2_reverse => sub {
 };
 
 subtest v2_items => sub {
-    plan tests => 25;
+    plan tests => 26;
 
     my $app = D2::Ajax->to_app;
 
@@ -67,6 +67,8 @@ subtest v2_items => sub {
     my $items1 = decode_json($get1->content);
     is scalar @{$items1->{items}}, 1;
     is $items1->{items}[0]{text}, 'First Thing to do';
+    like $items1->{items}[0]{date}, qr/^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$/;
+    #diag explain $items1;
 
     my $res2  = $test->request( POST '/api/v2/item', { text => '' } );
     is $res2->content, '{"error":"No text provided"}';
@@ -118,4 +120,3 @@ subtest v2_items => sub {
     my $db   = $client->get_database( $db_name );
     $db->drop;
 };
-

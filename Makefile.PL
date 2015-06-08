@@ -23,6 +23,7 @@ WriteMakefile(
         'Test::NoWarnings' => 0,
         'MongoDB'    => 0,
         'JSON::MaybeXS' => 0,
+        'DateTime::Tiny' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'D2-Ajax-*' },

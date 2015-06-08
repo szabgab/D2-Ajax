@@ -2,6 +2,8 @@ package D2::Ajax;
 use Dancer2;
 use MongoDB ();
 use JSON::MaybeXS;
+use DateTime::Tiny;
+sub DateTime::Tiny::TO_JSON { shift->as_string };
 
 our $VERSION = '0.1';
 
@@ -9,6 +11,7 @@ sub _mongodb {
     my ($collection) = @_;
 
     my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
+    $client->dt_type( 'DateTime::Tiny' );
     my $db   = $client->get_database( config->{app}{mongodb} );
     return $db->get_collection($collection);
 }
@@ -55,6 +58,7 @@ post '/api/v2/item' => sub {
     my $items = _mongodb('items');
     $items->insert({
         text => $text,
+        date => DateTime::Tiny->now,
     });
     return to_json { ok => 1, text => $text };
 };
@@ -82,4 +86,3 @@ options '/api/v2/item/:id' => sub {
 };
 
 true;
-
