@@ -6,7 +6,17 @@
 
   <title>D2::Ajax - v2</title>
   <script type="text/javascript" src="../public/javascripts/jquery.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.min.js"></script>
   <script src="v2.js"></script>
+
+  <script id="show-items-template" type="text/x-handlebars-template">
+  <ul>
+  {{#each data.items}}
+      <li>{{ text }} <button class="delete" data-id="{{ _id.$oid }}">x</a></li>
+  {{/each}}
+  </ul>
+  </script>
+
 </head>
 <body>
 
@@ -28,5 +38,3 @@
 
 </body>
 </html>
-
-
