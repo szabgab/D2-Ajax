@@ -10,11 +10,16 @@
   <script src="v2.js"></script>
 
   <script id="show-items-template" type="text/x-handlebars-template">
-  <ul>
+  <table>
+      <thead>
+      <tr><th>Item</th><th>Date</th><th>X</th></tr>
+      </thead>
+      <tbody>
   {{#each data.items}}
-      <li>{{ text }} {{ date }} <button class="delete" data-id="{{ _id.$oid }}">x</a></li>
+      <tr><td>{{ text }}</td><td>{{ date }}</td><td><button class="delete" data-id="{{ _id.$oid }}">x</a></td></tr>
   {{/each}}
-  </ul>
+      </tbody>
+  </table>
   </script>
 
 </head>
