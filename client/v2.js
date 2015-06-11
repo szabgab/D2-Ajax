@@ -1,38 +1,51 @@
+var items;
+
 function delete_item() {
     var id = $(this).attr('data-id');
     jQuery.ajax({
         url: 'http://127.0.0.1:5000/api/v2/item/' + id,
         type: 'DELETE',
         success: function(data) {
+            items = undefined;
             show_items();
         }
     });
 }
 
-function show_items() {
+function get_items() {
     jQuery.get('http://127.0.0.1:5000/api/v2/items', function(data) {
-        var i;
-        console.log(data);
-        var source   = document.getElementById('show-items-template').innerHTML;
-        var template = Handlebars.compile(source);
-        var html    = template({ data: data });
-
-        $("#items").html(html);
-        var cfg = {
-            textExtraction: function(node) {
-                var $node = $(node);
-                var sort = $node.attr("sort");
-                if (!sort) { return $node.text(); }
-                if ($node.hasClass("date")) {
-                    return (new Date(sort)).getTime();
-                } else {
-                   return sort;
-               }
-           }
-        };
-        $("#items-table").tablesorter(cfg);
-        $(".delete").click(delete_item);
+        items = data;
+        show_items();
     });
+}
+
+function show_items() {
+    if (items === undefined) {
+        get_items()
+        return;
+    }
+
+    var i;
+    console.log(items);
+    var source   = document.getElementById('show-items-template').innerHTML;
+    var template = Handlebars.compile(source);
+    var html    = template({ data: items });
+
+    $("#items").html(html);
+    var cfg = {
+        textExtraction: function(node) {
+            var $node = $(node);
+            var sort = $node.attr("sort");
+            if (!sort) { return $node.text(); }
+            if ($node.hasClass("date")) {
+                return (new Date(sort)).getTime();
+            } else {
+                return sort;
+            }
+        }
+    };
+    $("#items-table").tablesorter(cfg);
+    $(".delete").click(delete_item);
 }
 
 $(document).ready(function() {
@@ -61,6 +74,7 @@ $(document).ready(function() {
             if (data["ok"]) {
                 $("#msg").html('Item ' + data["text"] + ' added');
             }
+            items = undefined;
             show_items();
 
         });
