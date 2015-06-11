@@ -6,7 +6,13 @@ function delete_item() {
         url: 'http://127.0.0.1:5000/api/v2/item/' + id,
         type: 'DELETE',
         success: function(data) {
-            items = undefined;
+            var j;
+            for ( j = 0; j < items["items"].length; j++) {
+                if (items["items"][j]["_id"]["$oid"] === id) {
+                    items["items"].splice(j, 1)
+                    break;
+                }
+            }
             show_items();
         }
     });
