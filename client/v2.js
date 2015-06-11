@@ -18,6 +18,7 @@ function show_items() {
         var html    = template({ data: data });
 
         $("#items").html(html);
+        $("#items-table").tablesorter();
         $(".delete").click(delete_item);
     });
 }

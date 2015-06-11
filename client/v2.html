@@ -6,11 +6,13 @@
 
   <title>D2::Ajax - v2</title>
   <script type="text/javascript" src="../public/javascripts/jquery.js"></script>
+  <script type="text/javascript" src="../public/javascripts/jquery.tablesorter.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.min.js"></script>
   <script src="v2.js"></script>
 
   <script id="show-items-template" type="text/x-handlebars-template">
-  <table>
+  <table id="items-table" class="tablesorter">
+
       <thead>
       <tr><th>Item</th><th>Date</th><th>X</th></tr>
       </thead>
