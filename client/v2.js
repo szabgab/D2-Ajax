@@ -18,7 +18,19 @@ function show_items() {
         var html    = template({ data: data });
 
         $("#items").html(html);
-        $("#items-table").tablesorter();
+        var cfg = {
+            textExtraction: function(node) {
+                var $node = $(node);
+                var sort = $node.attr("sort");
+                if (!sort) { return $node.text(); }
+                if ($node.hasClass("date")) {
+                    return (new Date(sort)).getTime();
+                } else {
+                   return sort;
+               }
+           }
+        };
+        $("#items-table").tablesorter(cfg);
         $(".delete").click(delete_item);
     });
 }

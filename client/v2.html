@@ -20,7 +20,7 @@
       </thead>
       <tbody>
   {{#each data.items}}
-      <tr><td>{{ text }}</td><td>{{ date }}</td><td><button class="delete" data-id="{{ _id.$oid }}">x</a></td></tr>
+      <tr><td>{{ text }}</td><td class="date" sort="{{ date }}">{{ date }}</td><td><button class="delete" data-id="{{ _id.$oid }}">x</a></td></tr>
   {{/each}}
       </tbody>
   </table>
