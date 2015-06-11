@@ -19,6 +19,13 @@ function get_items() {
     });
 }
 
+function get_item(id) {
+    jQuery.get('http://127.0.0.1:5000/api/v2/item/' + id , function(data) {
+        items["items"].push(data["item"]);
+        show_items();
+    });
+}
+
 function show_items() {
     if (items === undefined) {
         get_items()
@@ -73,9 +80,8 @@ $(document).ready(function() {
             }
             if (data["ok"]) {
                 $("#msg").html('Item ' + data["text"] + ' added');
+                get_item(data["id"]);
             }
-            items = undefined;
-            show_items();
 
         });
        return false;
