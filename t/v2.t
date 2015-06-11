@@ -9,6 +9,7 @@ use D2::Ajax;
 use Test::More tests => 3+1;
 use Plack::Test;
 use HTTP::Request::Common qw(GET POST DELETE);
+use Test::Deep;
 use Test::NoWarnings;
 use JSON::MaybeXS qw(decode_json);
 use MongoDB ();
@@ -50,6 +51,8 @@ subtest v2_reverse => sub {
 subtest v2_items => sub {
     plan tests => 29;
 
+    my  $OID = re('^[0-9a-f]{24}$');
+
     my $app = D2::Ajax->to_app;
 
     my $db_name = 'd2-ajax-' . $$ . '-' . time;
@@ -64,7 +67,7 @@ subtest v2_items => sub {
 
     my $res  = $test->request( POST '/api/v2/item', {text => 'First Thing to do' } );
     ok $res->is_success, '[POST /] successful';
-    is_deeply decode_json($res->content), { ok => 1, text  => 'First Thing to do' };
+    cmp_deeply decode_json($res->content), { ok => 1, text  => 'First Thing to do', id => $OID };
     is $res->header('Content-Type'), 'application/json';
     is $res->header('Access-Control-Allow-Origin'), '*';
 
@@ -91,7 +94,7 @@ subtest v2_items => sub {
     is $items3->{items}[0]{text}, 'First Thing to do';
 
     my $res4  = $test->request( POST '/api/v2/item', { text => '  one more  ' });
-    is_deeply decode_json($res4->content), { ok => 1, text => 'one more' };
+    cmp_deeply decode_json($res4->content), { ok => 1, text => 'one more',id => $OID };
 
     my $get4  = $test->request( GET '/api/v2/items');
     my $items4 = decode_json($get4->content);
@@ -108,7 +111,7 @@ subtest v2_items => sub {
     my @items = ("One 1", "Two 2", "Three 3");
     foreach my $it (@items) {
         my $res = $test->request( POST '/api/v2/item', { text => $it });
-        is_deeply decode_json($res->content), { ok => 1, text => $it };
+        cmp_deeply decode_json($res->content), { ok => 1, text => $it, id => $OID };
     }
     my $get5  = $test->request( GET '/api/v2/items');
     my $items5 = decode_json($get5->content);

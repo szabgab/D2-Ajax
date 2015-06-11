@@ -56,11 +56,13 @@ post '/api/v2/item' => sub {
     }
 
     my $items = _mongodb('items');
-    $items->insert({
+    my $obj = $items->insert({
         text => $text,
         date => DateTime::Tiny->now,
     });
-    return to_json { ok => 1, text => $text };
+    my $json = JSON::MaybeXS->new;
+    $json->convert_blessed(1);
+    return $json->encode( { ok => 1, text => $text, id => $obj->to_string } );
 };
 
 get '/api/v2/items' => sub {
