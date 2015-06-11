@@ -81,6 +81,17 @@ del '/api/v2/item/:id' => sub {
     return to_json { ok  => 1 };
 };
 
+get '/api/v2/item/:id' => sub {
+    my $id = param('id');
+
+    my $items = _mongodb('items');
+    my $data = $items->find_one({ _id => MongoDB::OID->new($id) });
+    my $json = JSON::MaybeXS->new;
+    $json->convert_blessed(1);
+    return $json->encode( { item =>  $data } );
+};
+
+
 options '/api/v2/item/:id' => sub {
     return '';
 };

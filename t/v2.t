@@ -48,7 +48,7 @@ subtest v2_reverse => sub {
 };
 
 subtest v2_items => sub {
-    plan tests => 26;
+    plan tests => 29;
 
     my $app = D2::Ajax->to_app;
 
@@ -56,6 +56,11 @@ subtest v2_items => sub {
     D2::Ajax->config->{app}{mongodb} = $db_name;
 
     my $test = Plack::Test->create($app);
+
+    my $get_item_0 =  $test->request( GET '/api/v2/item/12345' );
+    my $item_0 = decode_json($get_item_0->content);
+    #diag explain $item_0;
+    is $item_0->{item}, undef;
 
     my $res  = $test->request( POST '/api/v2/item', {text => 'First Thing to do' } );
     ok $res->is_success, '[POST /] successful';
@@ -69,6 +74,10 @@ subtest v2_items => sub {
     is $items1->{items}[0]{text}, 'First Thing to do';
     like $items1->{items}[0]{date}, qr/^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$/;
     #diag explain $items1;
+    my $get_item_1 =  $test->request( GET '/api/v2/item/' . $items1->{items}[0]{_id}{'$oid'});
+    my $item_1 = decode_json($get_item_1->content);
+    #diag explain $item_1;
+    is_deeply $item_1->{item}, $items1->{items}[0];
 
     my $res2  = $test->request( POST '/api/v2/item', { text => '' } );
     is $res2->content, '{"error":"No text provided"}';
@@ -89,6 +98,12 @@ subtest v2_items => sub {
     is scalar @{$items4->{items}}, 2;
     is $items4->{items}[0]{text}, 'First Thing to do';
     is $items4->{items}[1]{text}, 'one more';
+
+    my $get_item_4 =  $test->request( GET '/api/v2/item/' . $items4->{items}[1]{_id}{'$oid'});
+    my $item_4 = decode_json($get_item_4->content);
+    #diag explain $item_1;
+    is_deeply $item_4->{item}, $items4->{items}[1];
+
 
     my @items = ("One 1", "Two 2", "Three 3");
     foreach my $it (@items) {
