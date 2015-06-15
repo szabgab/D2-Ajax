@@ -20,7 +20,7 @@ hook before => sub {
     if (request->path =~ m{^/api/}) {
         header 'Content-Type' => 'application/json';
     }
-    if (request->path =~ m{^/api/v2/}) {
+    if (request->path =~ m{^/api/v[23]/}) {
         header 'Access-Control-Allow-Origin' => '*';
         header 'Access-Control-Allow-Methods' => 'GET, POST, OPTIONS, DELETE';
     }
@@ -95,6 +95,59 @@ get '/api/v2/item/:id' => sub {
 
 
 options '/api/v2/item/:id' => sub {
+    return '';
+};
+
+######################### v3
+
+post '/api/v3/item' => sub {
+    my $text = param('text') // '';
+    $text =~ s/^\s+|\s+$//g;
+    if ($text eq '') {
+        return to_json { error => 'No text provided' };
+    }
+
+    my $items = _mongodb('items');
+    my $obj = $items->insert({
+        text => $text,
+        date => DateTime::Tiny->now,
+    });
+    my $data = $items->find_one({ _id => $obj });
+    my $json = JSON::MaybeXS->new;
+    $json->convert_blessed(1);
+    return $json->encode( { ok => 1, item => $data } );
+};
+
+get '/api/v3/items' => sub {
+    my $items = _mongodb('items');
+    my @data =  $items->find->all;
+    my $json = JSON::MaybeXS->new;
+    $json->convert_blessed(1);
+    return $json->encode( { items =>  \@data } );
+};
+
+del '/api/v3/item/:id' => sub {
+    my $id = param('id');
+
+    my $items = _mongodb('items');
+    $items->remove({ _id => MongoDB::OID->new($id) });
+
+    my $json = JSON::MaybeXS->new;
+    return to_json { ok  => 1 };
+};
+
+get '/api/v3/item/:id' => sub {
+    my $id = param('id');
+
+    my $items = _mongodb('items');
+    my $data = $items->find_one({ _id => MongoDB::OID->new($id) });
+    my $json = JSON::MaybeXS->new;
+    $json->convert_blessed(1);
+    return $json->encode( { item =>  $data } );
+};
+
+
+options '/api/v3/item/:id' => sub {
     return '';
 };
 

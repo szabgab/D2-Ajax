@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+  <title>D2::Ajax - v2</title>
+  <script type="text/javascript" src="../public/javascripts/jquery.js"></script>
+  <script type="text/javascript" src="../public/javascripts/jquery.tablesorter.min.js"></script>
+  <script src="../public/javascripts/handlebars.min.js"></script>
+  <script src="todo.js"></script>
+
+  <link rel="stylesheet" href="../public/themes/blue/style.css" type="text/css" media="print, projection, screen" />
+
+  <script id="show-items-template" type="text/x-handlebars-template">
+    <div id="msg"></div>
+
+    <form>
+      <input name="text" id="text">
+      <input type="submit" id="add-item" value="Add item">
+    </form>
+
+    <table id="items-table" class="tablesorter">
+      <thead>
+      <tr><th>Item</th><th>Date</th><th>X</th></tr>
+      </thead>
+      <tbody>
+      {{#each data.items}}
+         <tr><td><a href="#id/{{ _id.$oid }}">{{ text }}</a></td><td class="date" sort="{{ date }}">{{ date }}</td><td><button class="delete" data-id="{{ _id.$oid }}">x</a></td></tr>
+      {{/each}}
+      </tbody>
+    </table>
+  </script>
+
+</head>
+<body>
+<a href="#">home</a>
+
+<div id="content"></div>
+
+</body>
+</html>
