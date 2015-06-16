@@ -11,8 +11,8 @@ function routing(route) {
     }
     var m = /^#id\/(\w+)$/.exec(route);
     if (m) {
+        console.log(m[1]);
         get_item(m[1]);
-        //console.log(m[1]);
     }
 }
 
@@ -44,12 +44,13 @@ function get_items() {
 
 function get_item(id) {
     jQuery.get('http://127.0.0.1:5000/api/v3/item/' + id , function(data) {
-        show_item(data["item"]);
+        console.log(data);
+        _display('show-item-template', data);
+        $("#update-item").click(update_item);
+
     });
 }
 
-function show_item(data) {
-}
 
 function show_items() {
     if (items === undefined) {
@@ -80,12 +81,38 @@ function show_items() {
 }
 
 function _display(template_name, data) {
-    var source   = document.getElementById(template_name).innerHTML;
+    var source   = $('#' + template_name).html();
     var template = Handlebars.compile(source);
     var html    = template(data);
 
     $("#content").html(html);
     return;
+}
+
+function update_item() {
+    var i;
+    var fields = {
+        'id' : $("#id").val(),
+        'text' : $("#text").val(),
+        'details' : $("#details").val()
+    };
+    jQuery.post('http://127.0.0.1:5000/api/v3/item', fields , function(data) {
+        console.log(data);
+        if (data["error"]) {
+            $("#msg").html('Error: ' + data["error"]);
+        }
+        if (data["ok"]) {
+            for (i=0; i < items["items"].length; i++) {
+                if (items["items"][i]['_id']['$oid'] === fields['id']) {
+                    items["items"][i]['text'] = fields['text'];
+                    break;
+                }
+            }
+            window.location.hash = '#';
+        }
+
+    });
+    return false;
 }
 
 function add_item() {

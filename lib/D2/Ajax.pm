@@ -106,12 +106,29 @@ post '/api/v3/item' => sub {
     if ($text eq '') {
         return to_json { error => 'No text provided' };
     }
-
+    my $details = param('details') // '';
+    $details =~ s/^\s+|\s+$//g;
+    my $id = param('id');
     my $items = _mongodb('items');
-    my $obj = $items->insert({
-        text => $text,
-        date => DateTime::Tiny->now,
-    });
+
+    my $obj;
+    #debug($text);
+    #debug($details);
+    if ($id) {
+        $obj = MongoDB::OID->new($id);
+        $items->update({ _id => $obj }, {
+            '$set' => {
+                text => $text,
+                details => $details,
+            }
+        });
+    } else {
+        $obj = $items->insert({
+            text => $text,
+            date => DateTime::Tiny->now,
+        });
+    }
+
     my $data = $items->find_one({ _id => $obj });
     my $json = JSON::MaybeXS->new;
     $json->convert_blessed(1);
