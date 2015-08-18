@@ -1,0 +1,24 @@
+<script src="../public/javascripts/angular.min.js"></script>
+<script>
+angular.module("DemoApp", [])
+    .controller("DemoController", function($scope, $http) {
+        $scope.reverse = function() {
+            $http.get('http://127.0.0.1:5000/api/v2/reverse?str=' + encodeURIComponent($scope.str)).then(
+                function(response) {
+                    console.log(response.data);
+                    $scope.reversed = response.data["text"];
+                },
+                function(response) {
+                    console.log("error");
+                }
+            );
+        }
+    }
+);
+
+</script>
+<div ng-app="DemoApp" ng-controller="DemoController">
+    <input ng-model="str"> <button ng-click="reverse()">Reverse</button>
+    Reversed: {{reversed}}
+    <div ng-show="error">Error! Check the console.</div>
+</div>

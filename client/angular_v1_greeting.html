@@ -1,0 +1,25 @@
+<script src="../public/javascripts/angular.min.js"></script>
+<script>
+angular.module("DemoApp", [])
+    .controller("DemoController", function($scope, $http) {
+        $http.get('http://127.0.0.1:5000/api/v1/greeting').then(
+            function(response) {
+                console.log(response);
+                $scope.greeting = response.data["text"];
+                $scope.error = false;
+            },
+            function(response) {
+                console.log("error");
+                console.log(response);
+                $scope.error = true;
+            }
+        );
+    }
+);
+
+</script>
+<div ng-app="DemoApp" ng-controller="DemoController">
+        {{greeting}}
+        <hr>
+    <div ng-show="error">Error! Check the console.</div>
+</div>

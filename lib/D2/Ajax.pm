@@ -2,8 +2,10 @@ package D2::Ajax;
 use Dancer2;
 use MongoDB ();
 use JSON::MaybeXS;
+use Data::Dumper qw(Dumper);
 use DateTime::Tiny;
 sub DateTime::Tiny::TO_JSON { shift->as_string };
+
 
 our $VERSION = '0.1';
 
@@ -23,6 +25,7 @@ hook before => sub {
     if (request->path =~ m{^/api/v[23]/}) {
         header 'Access-Control-Allow-Origin' => '*';
         header 'Access-Control-Allow-Methods' => 'GET, POST, OPTIONS, DELETE';
+        header 'Access-Control-Allow-Headers' => 'Content-Type';
     }
 };
 
@@ -50,11 +53,19 @@ get '/api/v2/reverse' => sub {
 
 post '/api/v2/item' => sub {
     my $text = param('text') // '';
+
+    # Issue with AngularJS  ???
+    eval {
+        if (not $text) {
+            my $params = from_json(request->{body});
+            $text = $params->{text};
+        }
+    };
+    debug($text);
     $text =~ s/^\s+|\s+$//g;
     if ($text eq '') {
         return to_json { error => 'No text provided' };
     }
-
     my $items = _mongodb('items');
     my $obj = $items->insert({
         text => $text,
@@ -93,7 +104,9 @@ get '/api/v2/item/:id' => sub {
     return $json->encode( { item =>  $data } );
 };
 
-
+options '/api/v2/item' => sub {
+    return '';
+};
 options '/api/v2/item/:id' => sub {
     return '';
 };
